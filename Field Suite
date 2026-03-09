@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Best Solar & Batteries Official Field Tool</title>
+    <style>
+        :root { --blue: #1a73e8; --green: #34c759; --dark: #1c1c1e; --gold: #ffcc00; --sig-teal: #00ced1; --red: #ff3b30; --soft-blue: #e3f2fd; }
+        body { font-family: -apple-system, sans-serif; background: #f2f2f7; margin: 0; padding: 10px; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
+        .card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); margin-bottom: 12px; }
+        .row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f2f2f7; }
+        label { font-size: 11px; font-weight: 700; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px; }
+        select, input[type="number"] { padding: 12px; background: #f2f2f7; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; box-sizing: border-box; width: 100%; margin-top: 5px; }
+        input[type="number"] { width: 70px; text-align: center; margin-top: 0; }
+        .section-title { font-size: 11px; font-weight: 800; color: var(--blue); margin: 15px 0 10px; text-transform: uppercase; }
+        .extra-btn { background: #f2f2f7; border: 2px solid transparent; border-radius: 12px; padding: 12px 8px; font-size: 13px; font-weight: 600; text-align: center; transition: all 0.2s ease; color: #444; cursor: pointer; }
+        .extra-btn.active { background: #eef6ff; border-color: var(--blue); color: var(--blue); box-shadow: 0 4px 12px rgba(0,122,255,0.15); }
+        .extra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
+        .multi-select { height: 160px; font-size: 11px; }
+        .price-box { background: var(--dark); color: white; padding: 25px; border-radius: 20px; text-align: center; margin-top: 15px; }
+        .strikethrough { font-size: 24px; color: #ff3b30; text-decoration: line-through; opacity: 0.8; font-weight: 700; margin-bottom: 5px; }
+        .total-amt { font-size: 44px; font-weight: 800; color: var(--green); margin: 5px 0; }
+        .disc-line { color: var(--sig-teal); font-weight: 800; font-size: 12px; margin: 4px 0; display: none; }
+        .weekly { font-size: 20px; color: var(--gold); font-weight: 700; margin-top: 10px; }
+        
+        /* Dashboard Styles */
+        .input-grid-sim { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .sim-label { font-size: 8px; font-weight: 800; color: #8e8e93; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .season-row { display: flex; gap: 8px; margin-bottom: 15px; }
+        .s-btn { flex: 1; padding: 12px 5px; border-radius: 12px; border: 2px solid #f2f2f7; background: white; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .s-btn.active { border-color: var(--blue); background: var(--soft-blue); color: var(--blue); }
+        .flow-section { background: var(--soft-blue); border-radius: 20px; padding: 20px 10px; margin-bottom: 12px; border: 1px solid #bbdefb; }
+        .flow-title { font-size: 11px; font-weight: 900; color: var(--blue); text-transform: uppercase; text-align: center; margin-bottom: 20px; letter-spacing: 1px; }
+        .linear-flow { display: flex; align-items: center; justify-content: space-between; position: relative; padding: 10px 0; }
+        .node { text-align: center; flex: 1; z-index: 2; }
+        .node .icon-box { background: white; width: 55px; height: 55px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .node .val-sim { font-size: 12px; font-weight: 900; display: block; line-height: 1.1; }
+        .node .lbl-sim { font-size: 8px; font-weight: 700; opacity: 0.6; text-transform: uppercase; margin-top: 3px; display: block; }
+        .arrow-box { flex: 0.5; text-align: center; color: #ccc; font-size: 16px; transition: color 0.3s; font-weight: 900; }
+        .arrow-box.active { color: var(--green); }
+        .arrow-box.grid-in { color: #ff3b30; }
+        .status-msg { text-align: center; font-size: 10px; font-weight: 800; margin-top: 10px; }
+        .fin-row-sim { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f2f2f7; font-size: 12px; font-weight: 700; }
+        .banner-sim { background: var(--dark); color: white; border-radius: 20px; padding: 18px; text-align: center; margin-top: 10px; }
+
+        /* CLOSING ENGINE STYLES */
+        .closer-card { background: var(--dark); border-radius: 25px; padding: 25px; margin-top: 20px; color: white; text-align: center; border: 2px solid var(--blue); }
+        .choice-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .choice-btn { padding: 20px; border-radius: 18px; border: none; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+        .btn-yes { background: var(--green); color: white; box-shadow: 0 4px 15px rgba(52, 199, 89, 0.4); }
+        .btn-no { background: #333; color: #8e8e93; }
+        .feedback-area { display: none; margin-top: 25px; padding-top: 25px; border-top: 1px solid #333; text-align: left; animation: fadeIn 0.4s ease; }
+        .objection-btn { background: #2c2c2e; color: #fff; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 12px; font-weight: 700; border: 1px solid #444; width: 100%; text-align: left; }
+        .rebuttal-box { background: #e3f2fd; color: var(--dark); padding: 15px; border-radius: 12px; font-size: 12px; line-height: 1.4; margin: 10px 0 20px; display: none; font-weight: 700; border-left: 5px solid var(--blue); }
+        .final-cta { background: var(--blue); color: white; padding: 22px; border-radius: 15px; width: 100%; font-weight: 900; font-size: 16px; border: none; margin-top: 15px; cursor: pointer; box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4); }
+        .secondary-cta { background: none; border: 2px solid #444; color: #8e8e93; padding: 15px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 12px; margin-top: 10px; cursor: pointer; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .comp-card { background: #fff; border-radius: 25px; padding: 25px; border: 3px solid var(--blue); margin-top: 20px; }
+        .comp-title { font-weight: 900; font-size: 16px; text-align: center; margin-bottom: 20px; color: var(--blue); }
+        .comp-split { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; margin-bottom: 20px; }
+        .comp-box { background: #f8f9fa; padding: 15px; border-radius: 15px; }
+        .comp-lbl { font-size: 9px; font-weight: 800; color: #8e8e93; text-transform: uppercase; margin-bottom: 8px; }
+        .comp-val { font-size: 20px; font-weight: 900; color: var(--dark); }
+        .habit-swap-future { background: #f0fff4; border-radius: 20px; padding: 20px; text-align: center; border: 1px solid var(--green); margin-top: 15px; display: none; }
+        .eb-stat-box { background: var(--soft-blue); padding: 15px; border-radius: 15px; border-left: 5px solid var(--blue); margin-bottom: 10px; }
+        .eb-gain-amt { color: var(--green); font-size: 32px; font-weight: 900; display: block; margin-top: 5px; }
+        .v-card { background: #fff; border-radius: 20px; padding: 20px; border: 1px solid #e5e5ea; margin-top: 12px; }
+        .v-gen-btn { background: var(--blue); color: white; border: none; padding: 16px; border-radius: 12px; width: 100%; font-weight: 800; font-size: 14px; cursor: pointer; }
+        .v-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+        .v-table td { padding: 10px 0; border-bottom: 1px solid #f2f2f7; font-weight: 600; }
+        .v-val { text-align: right; color: var(--red); font-weight: 800; }
+        .v-total-box { background: var(--dark); color: white; padding: 20px; border-radius: 15px; text-align: center; margin: 15px 0; }
+        .v-total-amt { font-size: 32px; font-weight: 900; color: var(--red); display: block; }
+        .v-checklist { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .v-checklist th { font-size: 9px; text-transform: uppercase; color: #8e8e93; padding-bottom: 8px; border-bottom: 2px solid #f2f2f7; }
+        .v-checklist td { padding: 10px 0; font-size: 11px; font-weight: 700; border-bottom: 1px solid #f2f2f7; }
+        .v-check { color: var(--green); text-align: center; font-weight: 900; }
+        .v-cross { color: var(--red); text-align: center; font-weight: 900; }
+        .v-rank-bar { background: #f2f2f7; padding: 10px; border-radius: 12px; display: flex; justify-content: space-around; margin-top: 15px; }
+        .v-rank-item { font-size: 8px; font-weight: 800; text-align: center; line-height: 1.2; color: #444; }
+        .stamp { text-align: center; font-size: 9px; font-weight: 800; color: #c1c1c1; margin-top: 20px; text-transform: uppercase; border-top: 1px solid #e5e5e5; padding-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div style="text-align:center; margin-bottom:15px; font-weight:900; font-size:18px;">ENERGY FLOW DASHBOARD</div>
+    <div class="input-grid-sim">
+        <div><label class="sim-label">Daily Use</label><input type="number" id="simUsage" value="20" oninput="recommend()"></div>
+        <div><label class="sim-label">Night %</label><input type="number" id="simNight" value="60" oninput="recommend()"></div>
+        <div><label class="sim-label">Solar kW</label><input type="number" id="simKw" value="10.45" step="0.05" oninput="sim()"></div>
+        <div><label class="sim-label">Bat kWh</label><input type="number" id="simBat" value="10" step="1" oninput="sim()"></div>
+        <div><label class="sim-label">FiT ($)</label><input type="number" id="simFit" value="0.08" step="0.01" oninput="sim()"></div>
+        <div><label class="sim-label">Import Rate</label><input type="number" id="simRate" value="0.38" step="0.01" oninput="sim()"></div>
+        <div style="grid-column: span 3; margin-top:5px;"><label class="sim-label">Daily Supply Charge ($)</label><input type="number" id="simSupply" value="1.15" step="0.01" oninput="sim()"></div>
+    </div>
+    <div class="season-row">
+        <button class="s-btn active" id="btn-winter" onclick="setSeason('winter', 2.5)">WINTER</button>
+        <button class="s-btn" id="btn-spring" onclick="setSeason('spring', 4.5)">SPRING/AUT</button>
+        <button class="s-btn" id="btn-summer" onclick="setSeason('summer', 6.0)">SUMMER</button>
+    </div>
+    <div class="flow-section">
+        <div class="flow-title">Daytime: Direct Power Sequence</div>
+        <div class="linear-flow">
+            <div class="node"><div class="icon-box">☀️</div><span class="val-sim" id="sdSolar">0.0k</span><span class="lbl-sim">Solar</span></div>
+            <div class="arrow-box active" id="aSun">▶</div>
+            <div class="node"><div class="icon-box">🏠</div><span class="val-sim" id="sdHome">0.0k</span><span class="lbl-sim">House</span></div>
+            <div class="arrow-box" id="aBat">▶</div>
+            <div class="node"><div class="icon-box">🔋</div><span class="val-sim" id="sdBat">0k / 0%</span><span class="lbl-sim">Battery</span></div>
+            <div class="arrow-box" id="aGrid">▶</div>
+            <div class="node"><div class="icon-box">🌐</div><span class="val-sim" id="sdGrid">0.0k</span><span class="lbl-sim">Grid</span></div>
+        </div>
+        <div class="status-msg" id="dStatus">STATUS: STABLE</div>
+    </div>
+    <div class="flow-section">
+        <div class="flow-title">Nighttime Utilization</div>
+        <div class="linear-flow">
+            <div class="node"><div class="icon-box">🌐</div><span class="val-sim" id="snGrid">0.0k</span><span class="lbl-sim">Grid</span></div>
+            <div class="arrow-box" id="aGridIn">▶</div>
+            <div class="node"><div class="icon-box">🏠</div><span class="val-sim" id="snHome">0.0k</span><span class="lbl-sim">House</span></div>
+            <div class="arrow-box" id="aBatOut">◀</div>
+            <div class="node"><div class="icon-box">🔋</div><span class="val-sim" id="snBat">0.0k</span><span class="lbl-sim">Battery</span></div>
+        </div>
+        <div class="status-msg" id="nStatus">STATUS: BATTERY ACTIVE</div>
+    </div>
+    <div class="fin-row-sim"><span>Daily Solar Credits</span><span style="color:var(--green)" id="sfCredits">+$0.00</span></div>
+    <div class="fin-row-sim"><span>Daily Supply + Shortfall</span><span style="color:#ff3b30" id="sfCosts">-$0.00</span></div>
+    <div class="fin-row-sim"><span>Daily Net Total</span><span id="sfNet">-$0.00</span></div>
+    <div class="banner-sim">
+        <div style="font-size:9px; opacity:0.7; margin-bottom:5px;">≈ ESTIMATED MONTHLY BILL</div>
+        <div style="font-size:32px; font-weight:900;" id="mBillSim">$0.00</div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="font-weight: 900; font-size: 18px; text-align: center; margin-bottom: 15px;">BEST SOLAR & BATTERIES</div>
+    <label>Sales Mode</label>
+    <select id="mode" onchange="syncUI()" style="margin-bottom:15px;"><option value="both">Solar + Battery</option><option value="solar">Solar Only</option><option value="battery">Battery Only</option></select>
+    <div id="solarInputs">
+        <label>System Size</label><select id="sysSize" onchange="calc()" style="margin-bottom:15px;"></select>
+        <label>Panel Upgrade</label><select id="pnlType" onchange="calc()"><option value="0">Risen 475W</option><option value="0.05">Jinko 510</option><option value="0.09">Aiko 465</option><option value="0.10">Aiko 475</option></select>
+    </div>
+    <div id="batInputs">
+        <div style="display:flex; gap:10px; margin-top:15px;"><div style="flex:1"><label>Phase</label><select id="phase" onchange="syncInverters()"><option value="1">1P</option><option value="3">3P</option></select></div><div style="flex:1"><label>Hardware</label><select id="bat" onchange="syncInverters()"><option value="sig">SigEnergy</option><option value="goodwe">GoodWe</option><option value="alpha">Alpha</option></select></div></div>
+        <label style="margin-top:15px; display:block;">Inverter Size</label><select id="invSize" onchange="syncBatteries()"></select>
+        <label style="margin-top:15px; display:block;">Battery Capacity</label><select id="batSize" onchange="calc()"></select>
+        <label style="margin-top:15px; display:block;">Cabling Distance</label><select id="cabling" onchange="calc()"></select>
+    </div>
+</div>
+
+<div class="card" id="roofSection">
+    <div class="section-title">Roof Essentials</div>
+    <div class="row"><span>Tile Roof ($20)</span><input type="number" class="roof-qty" data-cost="20" value="0" oninput="calc()"></div>
+    <div class="row"><span>Spanish Tiles ($40)</span><input type="number" class="roof-qty" data-cost="40" value="0" oninput="calc()"></div>
+    <div class="row"><span>Two Storey ($20)</span><input type="number" class="roof-qty" data-cost="20" value="0" oninput="calc()"></div>
+    <div class="row"><span>Removal ($40)</span><input type="number" class="roof-qty" data-cost="40" value="0" oninput="calc()"></div>
+    <div class="row"><span>Landscape ($20)</span><input type="number" class="roof-qty" data-cost="20" value="0" oninput="calc()"></div>
+    <div class="row"><span>Kliplock ($40)</span><input type="number" class="roof-qty" data-cost="40" value="0" oninput="calc()"></div>
+    <div class="row"><span>Pitch 25-34° ($40)</span><input type="number" class="roof-qty" data-cost="40" value="0" oninput="calc()"></div>
+    <div class="row"><span>Optimisers ($100 ea)</span><input type="number" id="optiQty" value="0" oninput="calc()"></div>
+</div>
+
+<div class="card">
+    <div class="section-title">Project Extras</div>
+    <select id="multiExtras" class="multi-select" multiple onchange="calc()">
+        <optgroup label="Infrastructure"><option value="100">Meter Isolator - $100</option><option value="100">Switch Enclosure - $100</option><option value="250">External Sub board 1P - $250</option><option value="500">External Sub board 3P - $500</option><option value="700">Internal Sub board - $700</option><option value="250">Surge Protection 1P - $250</option><option value="500">No Main Switch 1P - $500</option><option value="3000">No Main Switch 3P - $3000</option><option value="1500">Meter Board (Asbestos) - $1500</option><option value="5000">Full Meter Box Replacement - $5000</option></optgroup>
+        <optgroup label="Monitoring & Export"><option value="100">1P Fixed Export - $100</option><option value="300">3P Fixed Export - $300</option><option value="300">1P Flexible Export - $300</option><option value="600">2P Flexible Export - $600</option><option value="500">1P HK1000 Consumption - $500</option><option value="500">3P HK3000 Consumption - $500</option><option value="500">2P Alpha DTSU Meter - $500</option><option value="250">SIG Power Meter 1P - $250</option><option value="500">SIG Power Meter 3P - $500</option><option value="200">SIG Sub1G Transmitter - $200</option><option value="1500">1P Existing Catchpower - $1500</option><option value="1750">3P Existing Catchpower - $1750</option></optgroup>
+        <optgroup label="Height & Travel"><option value="850">EWP 13kw/Day - $850</option><option value="1300">Cherry Picker - $1300</option><option value="1000">Height Split (Single/Two) - $1000</option><option value="1000">Catenary Wire (5m) - $1000</option><option value="1500">Catenary Wire (10m) - $1500</option><option value="1000">Travel 100-200km - $1000</option><option value="3000">Travel 200-300km - $3000</option><option value="5000">Travel 300-500km - $5000</option></optgroup>
+        <optgroup label="Specialized Extras"><option value="200">Alpha Switch - $200</option><option value="200">2x Bollards - $200</option><option value="200">Cement Sheet - $200</option><option value="200">Form Ply - $200</option><option value="300">Site Visit - $300</option><option value="300">Hot Water Timer - $300</option><option value="500">Battery Removal (Keep) - $500</option><option value="1000">Battery Removal (Full) - $1000</option></optgroup>
+    </select>
+    <div class="row" style="margin-top:10px;"><span>RCD Type A ($50 ea)</span><input type="number" id="rcdQty" value="0" oninput="calc()"></div>
+</div>
+
+<div class="card">
+    <div class="section-title">EXCLUSIVE PROMOTIONS</div>
+    <label>ENVIRONMENT PROTECTION INCENTIVE</label>
+    <select id="epiPerc" onchange="calc()" style="margin-bottom:12px;"><option value="0">None Applied</option><option value="0.10">10%</option><option value="0.20">20%</option><option value="0.30">30%</option><option value="0.40">40%</option><option value="0.50">50%</option><option value="0.60">60%</option><option value="0.70">70%</option><option value="0.80">80% (Max)</option></select>
+    <div class="extra-grid"><div id="signBtn" class="extra-btn" style="grid-column: span 2;" onclick="toggleBtn(this)">Sign on Day Incentive</div></div>
+</div>
+
+<div class="price-box">
+    <div id="bookPrice" class="strikethrough">$0</div><div class="total-amt" id="netPrice">$0</div>
+    <div class="disc-line" id="dcLabel">DC COUPLE DISCOUNT: -$0</div>
+    <div class="disc-line" id="epiLabel">ENVIRO PROTECTION INCENTIVE: -$0</div>
+    <div class="disc-line" id="signLabel">SIGN ON DAY INCENTIVE: -$0</div>
+    <div class="weekly" id="weekPayment">$0.00 / week</div>
+</div>
+
+<div class="v-card">
+    <div style="text-align:center; margin-bottom:20px;"><span style="font-weight:900; font-size:16px;">VALUE GUARDIAN ANALYSIS</span></div>
+    <button class="v-gen-btn" onclick="vReveal()">GENERATE RISK COMPARISON</button>
+    <div id="analysisResult" style="display:none; margin-top:15px;">
+        <table class="v-table">
+            <tr><td>Service Savings (10yr Warranty)</td><td class="v-val">-$2,700</td></tr>
+            <tr><td>Compliance & Rectification Risk</td><td class="v-val">-$1,450</td></tr>
+            <tr><td>Wait-Time Production Loss</td><td class="v-val" id="vWaitLoss">-$0</td></tr>
+        </table>
+        <div class="v-total-box"><span style="font-size:9px; opacity:0.8;">Total Liability in Standard Quotes</span><span class="v-total-amt" id="vTotalRisk">$0</span></div>
+        <table class="v-checklist">
+            <thead><tr><th align="left">Standard of Care</th><th>BEST SOLAR</th><th>STANDARD</th></tr></thead>
+            <tbody>
+                <tr><td>In-House SAA Installers</td><td class="v-check">✓</td><td class="v-cross">✕</td></tr>
+                <tr><td>Dual License (Builder+Elec)</td><td class="v-check">✓</td><td class="v-cross">✕</td></tr>
+                <tr><td>24-48hr Tech Response</td><td class="v-check">✓</td><td class="v-cross">✕</td></tr>
+            </tbody>
+        </table>
+        <div class="v-rank-bar">
+            <div class="v-rank-item">#1 BATTERY<br>INSTALLER SA</div>
+            <div class="v-rank-item">#2 SOLAR<br>INSTALLER SA</div>
+            <div class="v-rank-item">700+ GOOGLE<br>REVIEWS</div>
+        </div>
+    </div>
+</div>
+
+<div class="comp-card">
+    <div class="comp-title">NOW VS FUTURE WEEKLY OUTGOINGS</div>
+    <div style="margin-bottom: 20px;"><label>Current Yearly Power Bill ($)</label><input type="number" id="yearlyBill" value="2400" oninput="runFinalComp()"></div>
+    <div class="comp-split">
+        <div class="comp-box"><div class="comp-lbl">Status Quo</div><div class="comp-val" id="nowWeek">$0.00</div><div class="comp-sub">per week (Bills only)</div></div>
+        <div class="comp-box" style="border: 2px solid var(--blue);"><div class="comp-lbl">With Best Solar</div><div class="comp-val" id="futureWeek">$0.00</div><div class="comp-sub">per week (System + Bills)</div></div>
+    </div>
+    <div id="habitSwapFuture" class="habit-swap-future">
+        <div style="font-size: 11px; font-weight: 800; color: var(--blue); margin-bottom: 10px;">LIFESTYLE DIFFERENCE</div>
+        <div style="display: flex; justify-content: space-around;">
+            <div><span id="fCoffee" style="font-size: 24px; font-weight: 900;">0.0</span><span class="lbl-sim">Coffees</span></div>
+            <div><span id="fBeer" style="font-size: 24px; font-weight: 900;">0.0</span><span class="lbl-sim">Pints</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="border-top: 5px solid var(--green); margin-top: 20px;">
+    <div class="eb-title">PROPERTY EQUITY BRIDGE</div>
+    <div style="margin-bottom: 20px;"><label>EST. CURRENT HOME VALUE ($)</label><input type="number" id="homeVal" value="750000" oninput="runFinalComp()"></div>
+    <div class="comp-split">
+        <div class="comp-box"><div class="comp-lbl">Today's Value</div><div class="comp-val" id="valToday">$750,000</div></div>
+        <div class="comp-box" style="background: #eaffea;"><div class="comp-lbl" style="color:var(--green)">Best Solar Value</div><div class="comp-val" id="valAfter" style="color:var(--green)">$0</div></div>
+    </div>
+    <div class="eb-stat-box"><span style="font-size: 10px; font-weight: 800; color: var(--dark); text-transform: uppercase;">Instant Asset Appreciation</span><span class="eb-gain-amt" id="ebGain">+$0</span></div>
+</div>
+
+<div class="closer-card">
+    <div style="font-weight:900; font-size:20px; letter-spacing:1px;">DOES THIS MAKE SENSE?</div>
+    <div style="font-size:11px; opacity:0.7; margin-top:10px; line-height:1.4;">Based on the data, moving forward with this asset swap is the only logical path. Do you agree?</div>
+    
+    <div class="choice-row" id="initialButtons">
+        <button class="choice-btn btn-no" onclick="handleNo()">NO</button>
+        <button class="choice-btn btn-yes" onclick="handleYes()">YES</button>
+    </div>
+
+    <div id="rejectionArea" class="feedback-area">
+        <div style="text-align:center; font-weight:900; font-size:16px; margin-bottom:15px; color:var(--red);">WHAT IS STOPPING YOU?</div>
+        
+        <button class="objection-btn" onclick="showRebuttal('ob-quote')">I want to look at other quotes first</button>
+        <div id="ob-quote" class="rebuttal-box">"Understood. But remember, a lower quote usually means higher liability. Standard installers don't protect you from the $4,150 safety risks we just identified. Does it make sense to risk your roof for a few hundred dollars?"</div>
+        
+        <button class="objection-btn" onclick="showRebuttal('ob-budget')">It's way out of my budget</button>
+        <div id="ob-budget" class="rebuttal-box">"I hear you. But remember, you are already 'renting' this money from the grid. We are just swapping a bill for an asset. By NOT doing this, you are effectively paying the grid more every single week."</div>
+        
+        <button class="objection-btn" onclick="showRebuttal('ob-spouse')">I have to discuss with family / friends</button>
+        <div id="ob-spouse" class="rebuttal-box">"Absolutely. I'll send you this interactive report right now. When they see the Equity gain and Energy flow, they'll see why this is a smart family decision. Shall we generate that for you?"</div>
+
+        <div style="text-align:center; margin-top:20px;">
+            <div style="font-weight:900; font-size:14px; margin-bottom:10px;">Are you satisfied with these solutions?</div>
+            <button class="choice-btn btn-yes" style="width:100%" onclick="handleYes()">YES, I'M READY</button>
+        </div>
+    </div>
+
+    <div id="successArea" class="feedback-area">
+        <div class="congrats-text" id="congratsMsg">Congratulations! You've unlocked tax-free equity. Welcome to the family!</div>
+        <button class="final-cta" onclick="alert('Rep: Price Secured. Manually drafting Pylon proposal now!')">SECURE MY FIXED PRICE</button>
+        <button class="secondary-cta" id="sleepBtn" onclick="handleSleep()">I WOULD STILL LIKE TO SLEEP ON IT</button>
+        
+        <div id="sleepMsg" style="display:none; font-size:11px; margin-top:15px; color:#ffcc00; font-weight:700; line-height:1.4;">
+            No problem! You can still lock in your <u>Sign on Day</u> discount by signing the intent form today. No deposit needed for 48 hours. This ensures your price is protected while you rest easy!
+        </div>
+    </div>
+</div>
+
+<div class="stamp">OFFICIAL FIELD TOOL | BEST SOLAR & BATTERIES © 2026 | VERSION 66.0.0</div>
+
+<script>
+    let sunH = 2.5; let avgMonthlySim = 0; let globalWeekly = 0; let globalKw = 0;
+    
+    function handleYes() {
+        document.getElementById('initialButtons').style.display = 'none';
+        document.getElementById('rejectionArea').style.display = 'none';
+        document.getElementById('successArea').style.display = 'block';
+        const gain = document.getElementById('ebGain').innerText;
+        document.getElementById('congratsMsg').innerText = `Congratulations on saving for your future and adding ${gain} in home equity! Welcome to Best Solar. Your dream home starts here.`;
+    }
+    function handleNo() {
+        document.getElementById('initialButtons').style.display = 'none';
+        document.getElementById('rejectionArea').style.display = 'block';
+    }
+    function showRebuttal(id) {
+        document.querySelectorAll('.rebuttal-box').forEach(b => b.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+    }
+    function handleSleep() {
+        document.getElementById('sleepMsg').style.display = 'block';
+        document.getElementById('sleepBtn').style.display = 'none';
+    }
+
+    function recommend() { const u = parseFloat(document.getElementById('simUsage').value) || 0; const n = parseFloat(document.getElementById('simNight').value) / 100; document.getElementById('simKw').value = (u * 0.52).toFixed(2); document.getElementById('simBat').value = Math.ceil(u * n); sim(); }
+    function setSeason(s, h) { sunH = h; document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active')); document.getElementById('btn-' + s).classList.add('active'); sim(); }
+    function sim() {
+        const u = parseFloat(document.getElementById('simUsage').value) || 0; const nP = parseFloat(document.getElementById('simNight').value) / 100; const kw = parseFloat(document.getElementById('simKw').value) || 0; const batS = parseFloat(document.getElementById('simBat').value) || 1; const fit = parseFloat(document.getElementById('simFit').value) || 0; const supply = parseFloat(document.getElementById('simSupply').value) || 0; const rate = parseFloat(document.getElementById('simRate').value) || 0.38;
+        const dL = u * (1 - nP); const nL = u * nP; const gen = kw * sunH;
+        let ext = gen - dL; let dI = ext < 0 ? Math.abs(ext) : 0; let st = Math.min(Math.max(0, ext), batS); let exK = Math.max(0, ext - st); let nB = Math.min(nL, st); let nI = Math.max(0, nL - st);
+        document.getElementById('sdSolar').innerText = gen.toFixed(1) + "k"; document.getElementById('sdHome').innerText = dL.toFixed(1) + "k"; document.getElementById('sdBat').innerText = st.toFixed(1) + "k / " + Math.round((st/batS)*100) + "%"; document.getElementById('sdGrid').innerText = exK.toFixed(1) + "k";
+        document.getElementById('aBat').classList.toggle('active', ext > 0.1); document.getElementById('aGrid').classList.toggle('active', exK > 0.1);
+        document.getElementById('snHome').innerText = nL.toFixed(1) + "k"; document.getElementById('snBat').innerText = nB.toFixed(1) + "k"; document.getElementById('snGrid').innerText = nI.toFixed(1) + "k";
+        document.getElementById('aBatOut').classList.toggle('active', nB > 0.1); document.getElementById('aGridIn').classList.toggle('active', nI > 0.1);
+        const cred = exK * fit; const cost = (dI + nI) * rate; const net = (supply + cost) - cred; avgMonthlySim = net * 30.4;
+        document.getElementById('sfCredits').innerText = "+$" + cred.toFixed(2); document.getElementById('sfCosts').innerText = "-$" + (supply + cost).toFixed(2); document.getElementById('sfNet').innerText = (net < 0 ? "+$" : "-$") + Math.abs(net).toFixed(2); document.getElementById('sfNet').style.color = net < 0 ? "var(--green)" : "#ff3b30";
+        document.getElementById('mBillSim').innerText = (avgMonthlySim < 0 ? "CR " : "") + "$" + Math.abs(avgMonthlySim).toFixed(2); document.getElementById('mBillSim').style.color = avgMonthlySim < 0 ? "var(--green)" : "white";
+        runFinalComp();
+    }
+
+    function runFinalComp() {
+        const oldY = parseFloat(document.getElementById('yearlyBill').value) || 0; const oldW = oldY / 52; const totalNewW = globalWeekly + (avgMonthlySim / 4.34);
+        document.getElementById('nowWeek').innerText = "$" + oldW.toFixed(2); document.getElementById('futureWeek').innerText = "$" + totalNewW.toFixed(2);
+        const diff = totalNewW - oldW; const sBox = document.getElementById('habitSwapFuture');
+        if (diff > 0.5) { sBox.style.display = 'block'; document.getElementById('fCoffee').innerText = (diff / 5).toFixed(1); document.getElementById('fBeer').innerText = (diff / 10).toFixed(1); } else { sBox.style.display = 'none'; }
+        const homeVal = parseFloat(document.getElementById('homeVal').value) || 0; const annualSavings = Math.max(0, oldY - (avgMonthlySim * 12)); const equityGain = annualSavings * 20;
+        document.getElementById('valToday').innerText = "$" + homeVal.toLocaleString(); document.getElementById('ebGain').innerText = "+$" + Math.round(equityGain).toLocaleString(); document.getElementById('valAfter').innerText = "$" + Math.round(homeVal + equityGain).toLocaleString();
+    }
+
+    function toggleBtn(el) { el.classList.toggle('active'); calc(); }
+    function vReveal() { const wL = globalKw * 4.2 * 0.35 * 14; document.getElementById('vWaitLoss').innerText = "-$" + Math.round(wL).toLocaleString(); document.getElementById('vTotalRisk').innerText = "$" + Math.round(2700 + 1450 + wL).toLocaleString(); document.getElementById('analysisResult').style.display = 'block'; }
+
+    const SOLAR = [ {p:9,kw:4.275,inv:5200,stc:1125.20},{p:10,kw:4.75,inv:5400,stc:1241.60},{p:11,kw:5.225,inv:5500,stc:1396.80},{p:12,kw:5.7,inv:5700,stc:1513.20},{p:13,kw:6.175,inv:5900,stc:1629.60},{p:14,kw:6.65,inv:6050,stc:1746.00},{p:15,kw:7.125,inv:6100,stc:1901.20},{p:16,kw:7.6,inv:6250,stc:2017.60},{p:17,kw:8.075,inv:6350,stc:2134.00},{p:18,kw:8.55,inv:6450,stc:2289.20},{p:19,kw:9.025,inv:7100,stc:2405.60},{p:20,kw:9.5,inv:7250,stc:2522.00},{p:21,kw:9.975,inv:7350,stc:2638.40},{p:22,kw:10.45,inv:7450,stc:2793.60},{p:23,kw:10.925,inv:7550,stc:2910.00},{p:24,kw:11.4,inv:7700,stc:3026.40},{p:25,kw:11.875,inv:7800,stc:3181.60},{p:26,kw:12.35,inv:8150,stc:3298.00},{p:27,kw:12.825,inv:8250,stc:3414.40},{p:28,kw:13.775,inv:8650,stc:3686.00},{p:29,kw:13.775,inv:8750,stc:3686.00},{p:30,kw:14.25,inv:9000,stc:3802.40},{p:31,kw:14.72,inv:9400,stc:3918.80},{p:32,kw:15.2,inv:9700,stc:4074.00},{p:33,kw:15.67,inv:9800,stc:4190.40},{p:34,kw:16.15,inv:10000,stc:4306.80},{p:35,kw:16.62,inv:10200,stc:4423.20},{p:36,kw:17.1,inv:10350,stc:4578.40},{p:37,kw:17.57,inv:10600,stc:4694.80},{p:38,kw:18.05,inv:10850,stc:4811.20},{p:39,kw:18.52,inv:11150,stc:4927.60},{p:40,kw:19,inv:11400,stc:5082.80},{p:41,kw:19.47,inv:11700,stc:5199.20},{p:42,kw:19.95,inv:12000,stc:5315.60} ];
+    const PB = { goodwe_1p: { "5": {10:9950, 16:11550, 24:16550, 32:21900, 40:27500, 48:32950}, "8": {10:10600, 16:12200, 24:17200, 32:22550, 40:28150, 48:33600}, "9.9": {10:10700, 16:12300, 24:17300, 32:22650, 40:28250, 48:33700} }, goodwe_3p: { "5": {10:10750, 16:12350, 24:17400, 32:22650, 40:28250, 48:33700}, "8": {10:10950, 16:12550, 24:17600, 32:22850, 40:28400, 48:33900}, "10": {10:10350, 16:12500, 24:17500, 32:22900, 40:28450, 48:33850}, "15": {16:12650, 24:17700, 32:23000, 40:28600, 48:34000}, "20": {16:12750, 24:17750, 32:23100, 40:28700, 48:34100}, "25": {16:12800, 24:17800, 32:23200, 40:28800, 48:34150}, "30": {16:12900, 24:17900, 32:23300, 40:28900, 48:34250} }, sig_1p: { "5": {8:9350, 10:11500, 15:15550, 16:14600, 20:19900, 24:20600, 25:24100, 30:28500, 32:26600, 40:32500, 48:37800}, "10": {8:10750, 10:12900, 15:16950, 16:16000, 20:21300, 24:22000, 25:25400, 30:29800, 32:28000, 40:33900, 48:39200} }, sig_3p: { "5": {8:10350, 10:12550, 15:16550, 16:15400, 20:20800, 24:20800, 25:24950, 30:29400, 32:27600, 40:33500, 48:38700}, "10": {8:10750, 10:12900, 15:16900, 16:16000, 20:21200, 24:21200, 25:25350, 30:29850, 32:28000, 40:33900, 48:39200}, "15": {8:11650, 10:13800, 15:17800, 16:17000, 20:22100, 24:22100, 25:26200, 30:30700, 32:28900, 40:34800, 48:40100}, "20": {8:12150, 10:14300, 15:18320, 16:17500, 20:22600, 24:22600, 25:26800, 30:31200, 32:29400, 40:35300, 48:40600}, "25": {8:12800, 10:14950, 15:18950, 16:18100, 20:23250, 24:23250, 25:27400, 30:31800, 32:30000, 40:35900, 48:41200}, "30": {8:13250, 10:15450, 15:19450, 16:18600, 20:23700, 24:23700, 25:27900, 30:32350, 32:30600, 40:36500, 48:41800} }, alpha: { 5:7400, 10:8150, 13:9400, 20:13850 }, dc_disc: { goodwe_1p: { 5: 1200, 8: 1500, 9.9: 1700 }, goodwe_3p: { 5: 1500, 8: 1700, 10: 1900, 15: 2100, 20: 2400, 25: 2800, 30: 3300 }, sig_1p: { 5: 1200, 10: 1700 }, sig_3p: { 5: 1500, 10: 1750, 20: 2400 }, alpha: { 5: 1200 } }, cable_std: { free: 0, tier1: 500, tier2: 750, tier3: 1000 }, cable_gw: { free: 0, tier1: 1500, tier2: 2200, tier3: 2500 } };
+    function populateSolar() { const sys = document.getElementById('sysSize'); SOLAR.forEach((s, idx) => sys.add(new Option(`${s.kw} kW - Book: $${s.inv.toLocaleString()}`, idx))); }
+    function syncInverters() { const ph = document.getElementById('phase').value; const bat = document.getElementById('bat').value; const inv = document.getElementById('invSize'); const cur = inv.value; inv.innerHTML = ""; const iS = (bat === 'alpha') ? [5] : (ph === "1" ? Object.keys(PB[bat+'_1p']) : Object.keys(PB[bat+'_3p'])); iS.forEach(s => inv.add(new Option(s + "kW Inverter", s))); if(iS.includes(cur)) inv.value = cur; const cab = document.getElementById('cabling'); cab.innerHTML = ""; const cD = (bat === 'goodwe') ? PB.cable_gw : PB.cable_std; cab.add(new Option("0-10m Standard", "free")); cab.add(new Option(`10-20m ($${cD.tier1})`, "tier1")); cab.add(new Option(`20-30m ($${cD.tier2})`, "tier2")); cab.add(new Option(`30-40m ($${cD.tier3})`, "tier3")); syncBatteries(); }
+    function syncBatteries() { const ph = document.getElementById('phase').value; const bat = document.getElementById('bat').value; const inv = document.getElementById('invSize').value; const bS = document.getElementById('batSize'); bS.innerHTML = ""; const bD = (bat === 'alpha') ? PB.alpha : (ph === "1" ? PB[bat+'_1p'][inv] : PB[bat+'_3p'][inv]); if(bD) Object.keys(bD).sort((a,b)=>a-b).forEach(s => bS.add(new Option(s + " kWh", s))); calc(); }
+    function syncUI() { const mode = document.getElementById('mode').value; document.getElementById('solarInputs').style.display = mode === 'battery' ? 'none' : 'block'; document.getElementById('batInputs').style.display = mode === 'solar' ? 'none' : 'block'; document.getElementById('roofSection').style.display = mode === 'battery' ? 'none' : 'block'; syncInverters(); }
+    function calc() {
+        const m = document.getElementById('mode').value; const sIdx = document.getElementById('sysSize').value; const pT = parseFloat(document.getElementById('pnlType').value); const inv = document.getElementById('invSize').value; const bat = document.getElementById('bat').value; const bS = document.getElementById('batSize').value; const ph = document.getElementById('phase').value; const cT = document.getElementById('cabling').value;
+        let tN = 0; let stc = 0; let dcD = 0; let epiD = 0; let sigD = 0;
+        const epiP = parseFloat(document.getElementById('epiPerc').value);
+        if (m !== 'battery') { const d = SOLAR[sIdx]; globalKw = d.kw; stc = d.stc; tN += d.inv + (d.kw * 1000 * pT); document.querySelectorAll('.roof-qty').forEach(i => tN += (parseInt(i.value) * parseInt(i.dataset.cost))); tN += (parseInt(document.getElementById('optiQty').value) * 100); } else { globalKw = 0; }
+        if (m !== 'solar') { const bD = (bat === 'alpha') ? PB.alpha : (ph === "1" ? PB[bat+'_1p'][inv] : PB[bat+'_3p'][inv]); const bP = (bD[bS] || 0); tN += bP; if (m === 'both' && SOLAR[sIdx].kw >= 4) { dcD = ((bat === 'alpha') ? PB.dc_disc.alpha : PB.dc_disc[bat + '_' + ph + 'p'])[inv] || 0; tN -= dcD; } tN += (bat === 'goodwe' ? PB.cable_gw[cT] : PB.cable_std[cT]); }
+        tN += (parseInt(document.getElementById('rcdQty').value) || 0) * 50; const multi = document.getElementById('multiExtras'); for (let o of multi.selectedOptions) { tN += parseInt(o.value); }
+        if (epiP > 0) { epiD = ((globalKw + (m !== 'solar' ? parseFloat(bS) : 0)) * 1000 * 0.09) * epiP; tN -= epiD; }
+        if (document.getElementById('signBtn').classList.contains('active')) { sigD = (m === 'both') ? 500 : 250; tN -= sigD; }
+        document.getElementById('bookPrice').innerText = "$" + Math.round(tN + stc + sigD + epiD + dcD).toLocaleString();
+        document.getElementById('netPrice').innerText = "$" + Math.round(tN).toLocaleString();
+        document.getElementById('dcLabel').style.display = dcD > 0 ? 'block' : 'none'; document.getElementById('dcLabel').innerText = "DC COUPLE DISCOUNT: -$" + dcD.toLocaleString();
+        document.getElementById('epiLabel').style.display = epiD > 0 ? 'block' : 'none'; document.getElementById('epiLabel').innerText = "ENVIRO PROTECTION INCENTIVE: -$" + Math.round(epiD).toLocaleString();
+        document.getElementById('signLabel').style.display = sigD > 0 ? 'block' : 'none'; document.getElementById('signLabel').innerText = "SIGN ON DAY INCENTIVE: -$" + sigD.toLocaleString();
+        globalWeekly = tN / 260; document.getElementById('weekPayment').innerText = "$" + globalWeekly.toFixed(2) + " / week"; runFinalComp();
+    }
+    recommend(); populateSolar(); syncUI();
+</script>
+</body>
+</html>
